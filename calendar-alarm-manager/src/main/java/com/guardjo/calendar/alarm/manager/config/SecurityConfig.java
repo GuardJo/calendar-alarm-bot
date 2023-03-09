@@ -22,7 +22,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .anyRequest().authenticated()
                 ).formLogin(withDefaults())
-                .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"));
+                .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"))
+                .oauth2Login();
 
         return httpSecurity.build();
     }
