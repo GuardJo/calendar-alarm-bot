@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<thlogic>
+    <attr sel="#hello-user" th:text="안녕하세요" sec:authorize="isAuthenticated()"/>
+    <attr sel="#test-login" th:action="@{/oauth2/authorization/google}" sec:authorize="!isAuthenticated()"/>
+    <attr sel="#test-logout" th:action="@{/logout}" sec:authorize="isAuthenticated()"/>
+</thlogic>
