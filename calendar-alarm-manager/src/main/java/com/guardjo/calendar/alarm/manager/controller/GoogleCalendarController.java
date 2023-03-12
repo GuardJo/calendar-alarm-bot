@@ -2,6 +2,8 @@ package com.guardjo.calendar.alarm.manager.controller;
 
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarDto;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarSettingsDto;
+import com.guardjo.calendar.alarm.manager.domain.WatchRequest;
+import com.guardjo.calendar.alarm.manager.domain.WatchResponse;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +35,9 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/watch")
-    public String requestWatchEvent() {
+    public WatchResponse requestWatchEvent(@RequestBody WatchRequest watchRequest) {
         //TODO watch 이벤트 요청 전송
         log.info("[Test] Request Google Calendar Event Watch");
-        return "redirect:/";
+        return null;
     }
 }
