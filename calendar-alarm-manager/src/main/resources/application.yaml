@@ -7,7 +7,9 @@ spring:
             client-id: ${GOOGLE_OAUTH2_KEY}
             client-secret: ${GOOGLE_OAUTH2_SECRET}
             scope:
-              - profile
               - email
+              - https://www.googleapis.com/auth/calendar
+              - https://www.googleapis.com/auth/calendar.readonly
+              - https://www.googleapis.com/auth/calendar.settings.readonly
   thymeleaf3:
     decoupled-logic: true
