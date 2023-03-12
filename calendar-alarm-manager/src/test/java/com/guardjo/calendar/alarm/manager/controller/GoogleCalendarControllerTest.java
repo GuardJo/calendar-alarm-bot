@@ -77,8 +77,11 @@ class GoogleCalendarControllerTest {
     @Test
     @WithMockUser
     void testPostWatch() throws Exception {
+        String calendarId = "test@gmail.com";
         WatchRequest watchRequest = TestDataGenerator.generateWatchRequest();
         WatchResponse watchResponse = TestDataGenerator.generateWatchResponse();
+
+        given(googleApiConnectService.updateWatchEvent(calendarId, watchRequest)).willReturn(watchResponse);
 
         mockMvc.perform(post(POST_CALEDAR_WATCH_URL)
                 .contentType(MediaType.APPLICATION_JSON)

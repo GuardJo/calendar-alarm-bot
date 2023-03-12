@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -26,7 +27,9 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 ).formLogin(withDefaults())
                 .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"))
-                .oauth2Login();
+                .oauth2Login()
+                .and()
+                .csrf().disable();
 
         return httpSecurity.build();
     }

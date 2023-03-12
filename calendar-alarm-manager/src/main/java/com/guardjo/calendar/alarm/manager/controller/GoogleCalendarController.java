@@ -1,9 +1,7 @@
 package com.guardjo.calendar.alarm.manager.controller;
 
-import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarDto;
-import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarSettingsDto;
-import com.guardjo.calendar.alarm.manager.domain.WatchRequest;
-import com.guardjo.calendar.alarm.manager.domain.WatchResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.guardjo.calendar.alarm.manager.domain.*;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +33,15 @@ public class GoogleCalendarController {
     }
 
     @PostMapping("/watch")
-    public WatchResponse requestWatchEvent(@RequestBody WatchRequest watchRequest) {
-        //TODO watch 이벤트 요청 전송
+    public WatchResponse requestWatchEvent(@RequestParam String calendarId, WatchRequest watchRequest) throws JsonProcessingException {
         log.info("[Test] Request Google Calendar Event Watch");
-        return null;
+        return googleApiConnectService.updateWatchEvent(calendarId, watchRequest);
+    }
+
+    @PostMapping("/watch-stop")
+    public String requestWatchStop(WatchStopRequest watchStopRequest) throws JsonProcessingException {
+        log.info("[Test] Request Google Calendar Event Watch Stop, id = {}, resourceId = {}", watchStopRequest.getId(), watchStopRequest.getResourceId());
+        googleApiConnectService.stopWatchEvent(watchStopRequest);
+        return "ok";
     }
 }
