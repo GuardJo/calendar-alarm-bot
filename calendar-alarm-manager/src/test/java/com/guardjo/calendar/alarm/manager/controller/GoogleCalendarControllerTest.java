@@ -85,6 +85,7 @@ class GoogleCalendarControllerTest {
 
         mockMvc.perform(post(POST_CALEDAR_WATCH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
+                        .queryParam("calendarId", calendarId)
                 .content(objectMapper.writeValueAsString(watchRequest)))
                 .andExpect(status().isOk())
                 .andReturn()

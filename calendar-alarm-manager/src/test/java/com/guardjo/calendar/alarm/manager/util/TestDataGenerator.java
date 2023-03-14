@@ -52,7 +52,6 @@ public class TestDataGenerator {
         watchRequest.setId("test");
         watchRequest.setType("web_hook");
         watchRequest.setAddress("test addr");
-        watchRequest.setToken("test token");
 
         return watchRequest;
     }

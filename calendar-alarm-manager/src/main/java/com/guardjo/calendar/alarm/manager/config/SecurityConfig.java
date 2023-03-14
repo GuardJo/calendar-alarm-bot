@@ -24,6 +24,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .mvcMatchers(HttpMethod.GET, "/")
                                 .permitAll()
+                                .mvcMatchers(HttpMethod.POST, "/web-hook/receive")
+                                .permitAll()
                                 .anyRequest().authenticated()
                 ).formLogin(withDefaults())
                 .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"))
