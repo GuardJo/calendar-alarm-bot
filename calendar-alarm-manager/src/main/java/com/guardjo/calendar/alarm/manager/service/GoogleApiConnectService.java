@@ -1,20 +1,21 @@
 package com.guardjo.calendar.alarm.manager.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.guardjo.calendar.alarm.manager.domain.*;
+import com.guardjo.calendar.alarm.manager.config.JacksonConfig;
+import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
+import com.guardjo.calendar.alarm.manager.domain.exception.EventNotFoundException;
 import com.guardjo.calendar.alarm.manager.util.AccessTokenGenerator;
 import com.guardjo.calendar.alarm.manager.util.GoogleCalendarAPI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
@@ -29,59 +30,43 @@ public class GoogleApiConnectService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public GoogleCalendarDto findCalendar(String calendarId) {
-        log.info("[Test] Find Calendar");
-        GoogleCalendarDto response = webClient.get()
-                .uri( GoogleCalendarAPI.REQUEST_GET_CALENDAR_URL + "/" + calendarId)
+    public GoogleCalendarEventResponse searchEvents(String calendarId, LocalDateTime start, LocalDateTime end) {
+        log.info("[Test] Search Google Calendar Events, calendarId = {}, startTime = {}, endTime = {}", calendarId, start, end);
+
+        String url = generateSearchCalendarEventsUrl(calendarId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(JacksonConfig.DATE_TIME_FORMAT);
+
+        return webClient.get()
+                .uri(uriBuilder ->
+                        uriBuilder.path(url)
+                                .queryParam("timeMin", start.format(formatter))
+                                .queryParam("timeMax", end.format(formatter))
+                                .build()
+                )
                 .header(HttpHeaders.AUTHORIZATION, accessTokenGenerator.getAccessToken())
                 .retrieve()
-                .bodyToMono(GoogleCalendarDto.class)
+                .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
+                    if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
+                        return Mono.error(new EventNotFoundException(calendarId));
+                    }
+                    else {
+                        return Mono.error(new RuntimeException("Client Error : " + clientResponse.statusCode()));
+                    }
+                })
+                .onStatus(HttpStatus::is5xxServerError, clientResponse -> {
+                    return Mono.error(new RuntimeException("Server Error : " + clientResponse.statusCode()));
+                })
+                .bodyToMono(GoogleCalendarEventResponse.class)
                 .block();
-
-        return response;
     }
 
-    public GoogleCalendarSettingsDto getCalendarSettings() {
-        log.info("[Test] Find Calendar Settings");
-        GoogleCalendarSettingsDto googleCalendarSettingsDto = webClient.get()
-                .uri(GoogleCalendarAPI.REQUEST_GET_CALENDAR_SETTINGS)
-                .header(HttpHeaders.AUTHORIZATION, accessTokenGenerator.getAccessToken())
-                .retrieve()
-                .bodyToMono(GoogleCalendarSettingsDto.class)
-                .block();
+    /*
+    google calendar event list 호출 api에 calendarId 삽입
+     */
+    private String generateSearchCalendarEventsUrl(String calendarId) {
+        String postfixUrl = GoogleCalendarAPI.REQUEST_CALENDAR_EVENTS_URL;
+        postfixUrl = postfixUrl.replace("{calendarId}", calendarId);
 
-        log.info("[Test] Response : {}", googleCalendarSettingsDto.toString());
-
-        return googleCalendarSettingsDto;
-    }
-
-    public WatchResponse updateWatchEvent(String calendarId, WatchRequest watchRequest) throws JsonProcessingException {
-        log.info("[Test] Update Calendar Watch, request : {}", watchRequest.toString());
-        String requestBody = objectMapper.writeValueAsString(watchRequest);
-
-        WatchResponse response = webClient.post()
-                .uri(GoogleCalendarAPI.REQUEST_WATCH_EVENT_URL.replace("{calendarId}", calendarId))
-                .header(HttpHeaders.AUTHORIZATION, accessTokenGenerator.getAccessToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(requestBody))
-                .retrieve()
-                .bodyToMono(WatchResponse.class)
-                .block();
-
-        log.info("[Test] Response : {}", response.toString());
-
-        return response;
-    }
-
-    public void stopWatchEvent(WatchStopRequest watchStopRequest) throws JsonProcessingException {
-        log.info("[Test] Stop Calendar Watch, id = {}, resourceId = {}", watchStopRequest.getId(), watchStopRequest.getResourceId());
-        String requestBody = objectMapper.writeValueAsString(watchStopRequest);
-
-        webClient.post()
-                .uri(GoogleCalendarAPI.REQUEST_WATCH_STOP_URL)
-                .header(HttpHeaders.AUTHORIZATION, accessTokenGenerator.getAccessToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(requestBody))
-                .retrieve();
+        return postfixUrl;
     }
 }

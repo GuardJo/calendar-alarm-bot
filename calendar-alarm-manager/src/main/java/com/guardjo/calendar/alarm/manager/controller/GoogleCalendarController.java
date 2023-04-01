@@ -1,16 +1,19 @@
 package com.guardjo.calendar.alarm.manager.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.guardjo.calendar.alarm.manager.domain.*;
+import com.guardjo.calendar.alarm.manager.constant.UrlConstant;
+import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/google-calendar")
+@RequestMapping(UrlConstant.GOOGLE_CALENDAR_PREFIX)
 @Slf4j
 public class GoogleCalendarController {
     private final GoogleApiConnectService googleApiConnectService;
@@ -19,29 +22,12 @@ public class GoogleCalendarController {
         this.googleApiConnectService = googleApiConnectService;
     }
 
-    @GetMapping("/detail")
-    public GoogleCalendarDto findCalendar(@RequestParam String calendarId) {
-        log.info("[Test] Request Find Google Calendar, calendarId = {}", calendarId);
-        return googleApiConnectService.findCalendar(calendarId);
-    }
+    @GetMapping(UrlConstant.GET_CALENDAR_EVENT_LIST_URL)
+    public GoogleCalendarEventResponse findGoogleCalendarEvents(@RequestParam String calendarId) {
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = LocalDateTime.now().plusDays(1L);
+        log.info("[Test] Request Find GoogleCalendarEvents, calendarId = {}, start = {}, end = {}", calendarId, startTime, endTime);
 
-    @GetMapping("/settings")
-    public GoogleCalendarSettingsDto findCalendarSetting(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        log.info("[Test] Request Find Google Calendar Setting");
-        log.info("user = {}", oAuth2User);
-        return googleApiConnectService.getCalendarSettings();
-    }
-
-    @PostMapping("/watch")
-    public WatchResponse requestWatchEvent(@RequestParam String calendarId, WatchRequest watchRequest) throws JsonProcessingException {
-        log.info("[Test] Request Google Calendar Event Watch");
-        return googleApiConnectService.updateWatchEvent(calendarId, watchRequest);
-    }
-
-    @PostMapping("/watch-stop")
-    public String requestWatchStop(WatchStopRequest watchStopRequest) throws JsonProcessingException {
-        log.info("[Test] Request Google Calendar Event Watch Stop, id = {}, resourceId = {}", watchStopRequest.getId(), watchStopRequest.getResourceId());
-        googleApiConnectService.stopWatchEvent(watchStopRequest);
-        return "ok";
+        return googleApiConnectService.searchEvents(calendarId, startTime, endTime);
     }
 }
