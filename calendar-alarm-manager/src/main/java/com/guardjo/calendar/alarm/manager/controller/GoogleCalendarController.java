@@ -1,5 +1,6 @@
 package com.guardjo.calendar.alarm.manager.controller;
 
+import com.guardjo.calendar.alarm.manager.constant.UrlConstant;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Date;
 
 @RestController
-@RequestMapping("/google-calendar")
+@RequestMapping(UrlConstant.GOOGLE_CALENDAR_PREFIX)
 @Slf4j
 public class GoogleCalendarController {
     private final GoogleApiConnectService googleApiConnectService;
@@ -25,7 +22,7 @@ public class GoogleCalendarController {
         this.googleApiConnectService = googleApiConnectService;
     }
 
-    @GetMapping("/events")
+    @GetMapping(UrlConstant.GET_CALENDAR_EVENT_LIST_URL)
     public GoogleCalendarEventResponse findGoogleCalendarEvents(@RequestParam String calendarId) {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.now().plusDays(1L);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.guardjo.calendar.alarm.manager.config.TestConfig;
+import com.guardjo.calendar.alarm.manager.constant.UrlConstant;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import com.guardjo.calendar.alarm.manager.util.TestDataGenerator;
@@ -34,9 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GoogleCalendarControllerTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
-
-    private final static String GOOGLE_CALENDAR_PREFIX = "/google-calendar";
-    private final static String GET_CALENDAR_EVENT_LIST = GOOGLE_CALENDAR_PREFIX + "/events";
+    private final static String TEST_GET_CALENDAR_EVENT_LIST =
+            UrlConstant.GOOGLE_CALENDAR_PREFIX + UrlConstant.GET_CALENDAR_EVENT_LIST_URL;
 
     @MockBean
     private GoogleApiConnectService googleApiConnectService;
@@ -51,8 +51,6 @@ class GoogleCalendarControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE, false);
-
-
     }
 
     @DisplayName("구글 캘린더 이벤트 조회 요청 테스트")
@@ -65,7 +63,7 @@ class GoogleCalendarControllerTest {
         given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(googleCalendarEventResponse);
 
-        String actualResponse = mockMvc.perform(get(GET_CALENDAR_EVENT_LIST)
+        String actualResponse = mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
                         .queryParam("calendarId", "test"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
@@ -81,7 +79,7 @@ class GoogleCalendarControllerTest {
         given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(googleCalendarEventResponse);
 
-        mockMvc.perform(get(GET_CALENDAR_EVENT_LIST)
+        mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
                         .queryParam("calendarId", "test"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost/login"));
@@ -96,7 +94,7 @@ class GoogleCalendarControllerTest {
         given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(null);
 
-        mockMvc.perform(get(GET_CALENDAR_EVENT_LIST)
+        mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
                         .queryParam("calendarId", "wrongId")
                 )
                 .andExpect(status().isNotFound());
