@@ -2,68 +2,68 @@ package com.guardjo.calendar.alarm.manager.util;
 
 import com.guardjo.calendar.alarm.manager.domain.*;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class TestDataGenerator {
-    public static GoogleCalendarDto generateGoogleCalendarDto() {
-        GoogleCalendarDto googleCalendarDto = new GoogleCalendarDto();
-        googleCalendarDto.setKind("calendar#calendar");
-        googleCalendarDto.setEtag("test");
-        googleCalendarDto.setId("test id");
-        googleCalendarDto.setSummary("test");
-        googleCalendarDto.setDescription("test");
-        googleCalendarDto.setLocation("test");
-        googleCalendarDto.setTimeZone("Asia/Seoul");
-        googleCalendarDto.setConferenceProperties(generateConferenceProperties());
-
-        return googleCalendarDto;
+    public static GoogleAccountInfo generateAccountInfo() {
+        return GoogleAccountInfo.of("id", "email", "tester", true);
     }
 
-    public static ConferenceProperties generateConferenceProperties() {
-        ConferenceProperties conferenceProperties = new ConferenceProperties();
-        conferenceProperties.setAllowedConferenceSolutionTypes(List.of("hangoutsMeet"));
-
-        return conferenceProperties;
+    public static GoogleCalendarScheduleInfo generateGoogleCalendarScheduleInfo() {
+        return GoogleCalendarScheduleInfo.of(
+                new Date(),
+                ZonedDateTime.now(),
+                TimeZone.getDefault().getDisplayName()
+        );
     }
 
-    public static GoogleCalendarSettingDto generateGoogleCalendarSettingDto() {
-        GoogleCalendarSettingDto googleCalendarSettingDto = new GoogleCalendarSettingDto();
-        googleCalendarSettingDto.setId("test id");
-        googleCalendarSettingDto.setEtag("test");
-        googleCalendarSettingDto.setKind("calendar#setting");
-        googleCalendarSettingDto.setValue("test");
-
-        return googleCalendarSettingDto;
+    public static GoogleCalendarReminderInfo generateGoogleCalendarReminderInfo() {
+        return GoogleCalendarReminderInfo.of(
+                "method",
+                1
+        );
     }
 
-    public static GoogleCalendarSettingsDto generateGoogleCalendarSettingsDto() {
-        GoogleCalendarSettingsDto googleCalendarSettingsDto = new GoogleCalendarSettingsDto();
-        googleCalendarSettingsDto.setEtag("test");
-        googleCalendarSettingsDto.setKind("calendar#settings");
-        googleCalendarSettingsDto.setItems(List.of(generateGoogleCalendarSettingDto()));
-        googleCalendarSettingsDto.setNextPageToken("test");
-        googleCalendarSettingsDto.setNextSyncToken("test");
-
-        return googleCalendarSettingsDto;
+    public static GoogleCalendarEventDto generateGoogleCalendarEventDto() {
+        return GoogleCalendarEventDto.of(
+                "kind",
+                "etag",
+                "testId",
+                "test",
+                "testLink",
+                ZonedDateTime.now(),
+                ZonedDateTime.now(),
+                "test summary",
+                "test description",
+                "korea",
+                "red",
+                generateAccountInfo(),
+                generateAccountInfo(),
+                generateGoogleCalendarScheduleInfo(),
+                generateGoogleCalendarScheduleInfo(),
+                false,
+                List.of(),
+                "",
+                generateGoogleCalendarScheduleInfo()
+        );
     }
 
-    public static WatchRequest generateWatchRequest() {
-        WatchRequest watchRequest = new WatchRequest();
-        watchRequest.setId("test");
-        watchRequest.setType("web_hook");
-        watchRequest.setAddress("test addr");
-
-        return watchRequest;
-    }
-
-    public static WatchResponse generateWatchResponse() {
-        WatchResponse watchResponse = new WatchResponse();
-        watchResponse.setId("test");
-        watchResponse.setToken("test token");
-        watchResponse.setExpiration(604800000);
-        watchResponse.setResourceUri("test uri");
-        watchResponse.setResourceId("test id");
-
-        return watchResponse;
+    public static GoogleCalendarEventResponse generateGoogleCalendarEventResponse() {
+        return GoogleCalendarEventResponse.of(
+                "kind",
+                "etag",
+                "test summary",
+                "test description",
+                ZonedDateTime.now(),
+                TimeZone.getDefault().getDisplayName(),
+                "TEST",
+                List.of(generateGoogleCalendarReminderInfo()),
+                "TestPageToken",
+                "TestSyncToken",
+                List.of(generateGoogleCalendarEventDto())
+        );
     }
 }
