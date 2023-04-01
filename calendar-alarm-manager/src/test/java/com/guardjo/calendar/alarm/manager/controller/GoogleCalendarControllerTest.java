@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.guardjo.calendar.alarm.manager.config.TestConfig;
 import com.guardjo.calendar.alarm.manager.constant.UrlConstant;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
+import com.guardjo.calendar.alarm.manager.domain.exception.EventNotFoundException;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import com.guardjo.calendar.alarm.manager.util.TestDataGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,7 +93,7 @@ class GoogleCalendarControllerTest {
     @Test
     void testGetCalendarEventListWithWrongCalendarId() throws Exception {
         given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .willReturn(null);
+                .willThrow(new EventNotFoundException("wrongId"));
 
         mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
                         .queryParam("calendarId", "wrongId")
