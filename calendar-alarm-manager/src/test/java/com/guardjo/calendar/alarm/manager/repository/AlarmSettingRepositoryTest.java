@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Example;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
@@ -17,16 +17,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class AlarmSettingRepositoryTest {
     private final AlarmSettingRepository alarmSettingRepository;
 
+    private long testId = 1L;
+
     @Autowired
     AlarmSettingRepositoryTest(AlarmSettingRepository alarmSettingRepository) {
         this.alarmSettingRepository = alarmSettingRepository;
     }
 
     @BeforeEach
+    @Rollback(value = false)
     void setUp() {
         AlarmSetting alarmSetting = AlarmSetting.of(null, "test", "token");
 
-        alarmSettingRepository.saveAndFlush(alarmSetting);
+        testId = alarmSettingRepository.saveAndFlush(alarmSetting).getId();
+        System.out.println("Setup Data, id = " + testId);
     }
 
     @DisplayName("알람 설정 정보 저장 테스트")
@@ -47,9 +51,7 @@ class AlarmSettingRepositoryTest {
     @DisplayName("식별값을 통해 알람 설정 정보 반환 테스트")
     @Test
     void testFindByIdAlarmSetting() {
-        Long id = 1L;
-
-        AlarmSettingDto alarmSettingDto = AlarmSettingDto.from(alarmSettingRepository.findById(id).orElseThrow());
+        AlarmSettingDto alarmSettingDto = AlarmSettingDto.from(alarmSettingRepository.findById(testId).orElseThrow());
 
         assertThat(alarmSettingDto.calendarId()).isEqualTo("test");
     }
@@ -65,13 +67,13 @@ class AlarmSettingRepositoryTest {
     @DisplayName("특정 알림 설정 정보 변경 테스트")
     @Test
     void testUpdateAlarmSetting() {
-        AlarmSetting alarmSetting = alarmSettingRepository.findById(1L).orElseThrow();
+        AlarmSetting alarmSetting = alarmSettingRepository.findById(testId).orElseThrow();
         String token = "updateToken";
 
         alarmSetting.setAccessToken(token);
         alarmSettingRepository.flush();
 
-        AlarmSetting actual = alarmSettingRepository.findById(1L).orElseThrow();
+        AlarmSetting actual = alarmSettingRepository.findById(testId).orElseThrow();
 
         assertThat(actual.getAccessToken()).isEqualTo(token);
     }
@@ -79,7 +81,7 @@ class AlarmSettingRepositoryTest {
     @DisplayName("특정 알림 설정 정보 삭제 테스트")
     @Test
     void testDeleteAlarmSetting() {
-        alarmSettingRepository.deleteById(1L);
+        alarmSettingRepository.deleteById(testId);
 
         assertThat(alarmSettingRepository.count()).isEqualTo(0);
     }
