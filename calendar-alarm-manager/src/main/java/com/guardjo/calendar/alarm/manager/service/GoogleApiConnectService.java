@@ -1,6 +1,5 @@
 package com.guardjo.calendar.alarm.manager.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guardjo.calendar.alarm.manager.config.JacksonConfig;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.domain.exception.EventNotFoundException;
@@ -22,12 +21,9 @@ import java.time.format.DateTimeFormatter;
 public class GoogleApiConnectService {
     private final WebClient webClient;
     private final AccessTokenGenerator accessTokenGenerator;
-    private final ObjectMapper objectMapper;
-
     public GoogleApiConnectService(@Autowired WebClient webClient, @Autowired AccessTokenGenerator accessTokenGenerator) {
         this.webClient = webClient;
         this.accessTokenGenerator = accessTokenGenerator;
-        this.objectMapper = new ObjectMapper();
     }
 
     public GoogleCalendarEventResponse searchEvents(String calendarId, LocalDateTime start, LocalDateTime end) {
