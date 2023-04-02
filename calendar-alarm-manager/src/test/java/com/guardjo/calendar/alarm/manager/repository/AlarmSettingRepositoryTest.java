@@ -5,13 +5,19 @@ import com.guardjo.calendar.alarm.manager.domain.AlarmSettingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 @DataJpaTest
 class AlarmSettingRepositoryTest {
@@ -84,5 +90,40 @@ class AlarmSettingRepositoryTest {
         alarmSettingRepository.deleteById(testId);
 
         assertThat(alarmSettingRepository.count()).isEqualTo(0);
+    }
+
+    @DisplayName("주어진 calendarId를 지닌 알림 설정 정보 반환 테스트")
+    @Test
+    void testFindByCalendarId() {
+        String calendarId = "test";
+        Optional<AlarmSetting> alarmSetting = alarmSettingRepository.findAlarmSettingByCalendarId(calendarId);
+
+        assertThat(alarmSetting.isEmpty()).isFalse();
+        assertThat(alarmSetting.get().getCalendarId()).isEqualTo(calendarId);
+    }
+
+    @DisplayName("해당 calendarId로 지정된 알림 설정 정보 존재 여부 반환 테스트")
+    @ParameterizedTest
+    @MethodSource("getCalendarIdListAndResult")
+    void testExistByCalendarId(String calendarId, boolean expected) {
+        boolean isExist = alarmSettingRepository.existsAlarmSettingByCalendarId(calendarId);
+
+        assertThat(isExist).isEqualTo(expected);
+    }
+
+    @DisplayName("해당하는 calendarId로 지정된 알림 설정 제거 테스트")
+    @Test
+    void testDeleteByCalendarId() {
+        String calendarId = "test";
+
+        assertThatCode(() -> alarmSettingRepository.deleteAlarmSettingByCalendarId(calendarId)).doesNotThrowAnyException();
+        assertThat(alarmSettingRepository.count()).isEqualTo(0L);
+    }
+
+    public static Stream<Arguments> getCalendarIdListAndResult() {
+        return Stream.of(
+                Arguments.arguments("test", true),
+                Arguments.arguments("test2", false)
+        );
     }
 }
