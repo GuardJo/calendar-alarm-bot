@@ -3,4 +3,6 @@
     <attr sel="#hello-user" th:text="안녕하세요" sec:authorize="isAuthenticated()"/>
     <attr sel="#test-login" th:action="@{/oauth2/authorization/google}" sec:authorize="!isAuthenticated()"/>
     <attr sel="#test-logout" th:action="@{/logout}" sec:authorize="isAuthenticated()"/>
+
+    <attr sel="#alarm-setting-request" sec:authorize="isAuthenticated()" />
 </thlogic>
