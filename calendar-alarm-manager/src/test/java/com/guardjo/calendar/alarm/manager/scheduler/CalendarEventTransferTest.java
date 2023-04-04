@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,9 +35,9 @@ class CalendarEventTransferTest {
         given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(expectedResponse);
 
-        GoogleCalendarEventResponse actualResponse = calendarEventTransfer.readGoogleCalendarEvents();
+        List<GoogleCalendarEventResponse> actualResponse = calendarEventTransfer.readAllGoogleCalendarEvents();
 
-        assertThat(actualResponse).isEqualTo(expectedResponse);
+        assertThat(actualResponse).isEqualTo(List.of(expectedResponse));
 
         then(googleApiConnectService).should().searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
     }
