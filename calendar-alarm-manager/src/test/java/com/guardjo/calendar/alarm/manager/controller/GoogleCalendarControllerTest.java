@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.guardjo.calendar.alarm.manager.config.TestConfig;
 import com.guardjo.calendar.alarm.manager.constant.UrlConstant;
+import com.guardjo.calendar.alarm.manager.domain.AlarmSettingDto;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.domain.exception.EventNotFoundException;
+import com.guardjo.calendar.alarm.manager.service.AlarmSettingService;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
+import com.guardjo.calendar.alarm.manager.util.AccessTokenGenerator;
 import com.guardjo.calendar.alarm.manager.util.TestDataGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,9 +28,9 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,9 +41,15 @@ class GoogleCalendarControllerTest {
     private final ObjectMapper objectMapper;
     private final static String TEST_GET_CALENDAR_EVENT_LIST =
             UrlConstant.GOOGLE_CALENDAR_PREFIX + UrlConstant.GET_CALENDAR_EVENT_LIST_URL;
+    private final static String TEST_SAVE_CALENDAR_ALARM_SETTING =
+            UrlConstant.GOOGLE_CALENDAR_PREFIX + UrlConstant.SAVE_ALARM_SETTING_URL;
 
     @MockBean
     private GoogleApiConnectService googleApiConnectService;
+    @MockBean
+    private AlarmSettingService alarmSettingService;
+    @MockBean
+    private AccessTokenGenerator accessTokenGenerator;
 
     GoogleCalendarControllerTest(@Autowired MockMvc mockMvc) {
         this.mockMvc = mockMvc;
@@ -101,5 +110,36 @@ class GoogleCalendarControllerTest {
                 .andExpect(status().isNotFound());
 
         then(googleApiConnectService).should().searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
+    }
+
+    @DisplayName("구글 캘린더 알림 설정 저장 테스트")
+    @WithMockUser
+    @Test
+    void testSaveAlarmSetting() throws Exception {
+        willDoNothing().given(alarmSettingService).saveAlarmSetting(any(AlarmSettingDto.class));
+        given(accessTokenGenerator.getAccessToken()).willReturn("testToken");
+
+        mockMvc.perform(post(TEST_SAVE_CALENDAR_ALARM_SETTING)
+                        .queryParam("calendarId", "testId")
+                )
+                .andExpect(status().isOk());
+
+        then(alarmSettingService).should().saveAlarmSetting(any(AlarmSettingDto.class));
+        then(accessTokenGenerator).should().getAccessToken();
+    }
+
+    @DisplayName("구글 로그인 정보 없이 알림 설정 저장 요청 테스트")
+    @Test
+    void testSaveAlarmSettingWithoutLogin() throws Exception {
+        willDoNothing().given(alarmSettingService).saveAlarmSetting(any(AlarmSettingDto.class));
+        given(accessTokenGenerator.getAccessToken()).willReturn("testToken");
+
+        mockMvc.perform(post(TEST_SAVE_CALENDAR_ALARM_SETTING)
+                        .queryParam("calendarId", "testId")
+                )
+                .andExpect(status().is3xxRedirection());
+
+        then(alarmSettingService).shouldHaveNoInteractions();
+        then(accessTokenGenerator).shouldHaveNoInteractions();
     }
 }
