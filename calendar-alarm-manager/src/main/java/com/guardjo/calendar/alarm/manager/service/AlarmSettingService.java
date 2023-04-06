@@ -1,10 +1,15 @@
 package com.guardjo.calendar.alarm.manager.service;
 
+import com.guardjo.calendar.alarm.manager.domain.AlarmSetting;
 import com.guardjo.calendar.alarm.manager.domain.AlarmSettingDto;
 import com.guardjo.calendar.alarm.manager.repository.AlarmSettingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,6 +34,18 @@ public class AlarmSettingService {
     public void deleteAlarmSetting(String calendarId) {
         alarmSettingRepository.deleteAlarmSettingByCalendarId(calendarId);
         log.info("[Test] Deleted AlarmSetting, calendarId = {}", calendarId);
+    }
+
+    public Set<String> findAllSettingCalendarIds() {
+        List<AlarmSetting> alarmSettings = findAll();
+
+        return alarmSettings.stream()
+                .map((alarmSetting -> alarmSetting.getCalendarId()))
+                .collect(Collectors.toSet());
+    }
+
+    public List<AlarmSetting> findAll() {
+        return alarmSettingRepository.findAll();
     }
 
     /*
