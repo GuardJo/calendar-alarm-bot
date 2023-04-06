@@ -1,6 +1,7 @@
 package com.guardjo.calendar.alarm.manager.scheduler;
 
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
+import com.guardjo.calendar.alarm.manager.service.AlarmSettingService;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
 import com.guardjo.calendar.alarm.manager.util.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +25,8 @@ import static org.mockito.BDDMockito.then;
 class CalendarEventTransferTest {
     @Mock
     private GoogleApiConnectService googleApiConnectService;
-
+    @Mock
+    private AlarmSettingService alarmSettingService;
     @InjectMocks
     private CalendarEventTransfer calendarEventTransfer;
 
@@ -32,6 +35,7 @@ class CalendarEventTransferTest {
     void testReadGoogleCalendarEvents() {
         GoogleCalendarEventResponse expectedResponse = TestDataGenerator.generateGoogleCalendarEventResponse();
 
+        given(alarmSettingService.findAllSettingCalendarIds()).willReturn(Set.of("testId"));
         given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(expectedResponse);
 

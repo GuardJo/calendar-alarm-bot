@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -29,7 +30,7 @@ public class CalendarEventTransfer {
         log.info("[Test] Scheduling Start, FindAll GoogleCalendarEvents");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.now().plusDays(1L);
-        List<String> calendarIds = findAlarmSettingCalendarIdList();
+        Set<String> calendarIds = findAlarmSettingCalendarIdList();
         List<GoogleCalendarEventResponse> googleCalendarEventResponses = new ArrayList<>();
 
         if (calendarIds.isEmpty()) {
@@ -47,9 +48,8 @@ public class CalendarEventTransfer {
         return googleCalendarEventResponses;
     }
 
-    private List<String> findAlarmSettingCalendarIdList() {
-        // TODO 저장된 AlarmSetting의 calendarId 목록 반환
-        return List.of();
+    private Set<String> findAlarmSettingCalendarIdList() {
+        return alarmSettingService.findAllSettingCalendarIds();
     }
 
     private GoogleCalendarEventResponse readGoogleCalendarEvents(String calendarId, LocalDateTime startTime, LocalDateTime endTime) {
