@@ -39,12 +39,16 @@ public class AlarmSettingService {
     public Set<String> findAllSettingCalendarIds() {
         List<AlarmSetting> alarmSettings = findAll();
 
+        log.info("[Test] FindAll calendarIds of alarmSettings");
+
         return alarmSettings.stream()
                 .map((alarmSetting -> alarmSetting.getCalendarId()))
                 .collect(Collectors.toSet());
     }
 
+    @Transactional(readOnly = true)
     public List<AlarmSetting> findAll() {
+        log.info("[Test] Find all AlarmSettings");
         return alarmSettingRepository.findAll();
     }
 

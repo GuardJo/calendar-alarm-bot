@@ -10,6 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
 
@@ -57,5 +61,57 @@ class AlarmSettingServiceTest {
         alarmSettingService.deleteAlarmSetting(calendarId);
 
         then(alarmSettingRepository).should().deleteAlarmSettingByCalendarId(anyString());
+    }
+
+    @DisplayName("저장된 알람설정 목록 반환 테스트")
+    @Test
+    void testFindAllAlarmSettings() {
+        List<AlarmSetting> expected = List.of(AlarmSetting.of(-1L, "testId", "testToken"));
+
+        given(alarmSettingRepository.findAll()).willReturn(expected);
+
+        List<AlarmSetting> actual = alarmSettingService.findAll();
+
+        assertThat(actual).isEqualTo(expected);
+        then(alarmSettingRepository).should().findAll();
+    }
+
+    @DisplayName("알림설정으로 지정된 calendarId 목록 반환 테스트")
+    @Test
+    void testFindAllSettingCalendarIds() {
+        String expectedId = "testId";
+        Set<String> expected = Set.of(expectedId);
+        List<AlarmSetting> alarmSettings = List.of(AlarmSetting.of(-1L, expectedId, "testToken"));
+
+        given(alarmSettingRepository.findAll()).willReturn(alarmSettings);
+
+        Set<String> actual = alarmSettingService.findAllSettingCalendarIds();
+
+        assertThat(actual).isEqualTo(expected);
+        then(alarmSettingRepository).should().findAll();
+    }
+
+    @DisplayName("저장된 알림 설정 정보가 없을 때 목록 반환 테스트")
+    @Test
+    void testFindAllSettingButNull() {
+        List<AlarmSetting> expected = List.of();
+
+        given(alarmSettingRepository.findAll()).willReturn(expected);
+
+        List<AlarmSetting> actual = alarmSettingService.findAll();
+
+        assertThat(actual.isEmpty()).isTrue();
+        then(alarmSettingRepository).should().findAll();
+    }
+
+    @DisplayName("저장된게 없을 때 알림설정의 calendarId 목록 반환")
+    @Test
+    void testFindAllSettingsCalendarIdButNull() {
+        given(alarmSettingRepository.findAll()).willReturn(List.of());
+
+        Set<String> actual = alarmSettingService.findAllSettingCalendarIds();
+
+        assertThat(actual.isEmpty()).isTrue();
+        then(alarmSettingRepository).should().findAll();
     }
 }
