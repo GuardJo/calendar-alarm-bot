@@ -1,6 +1,5 @@
 package com.guardjo.calendar.alarm.manager.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.guardjo.calendar.alarm.manager.config.JacksonConfig;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.domain.exception.EventNotFoundException;
@@ -21,16 +20,11 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class GoogleApiConnectService {
     private final WebClient webClient;
-    private final AccessTokenGenerator accessTokenGenerator;
-    private final ObjectMapper objectMapper;
-
-    public GoogleApiConnectService(@Autowired WebClient webClient, @Autowired AccessTokenGenerator accessTokenGenerator) {
+    public GoogleApiConnectService(@Autowired WebClient webClient) {
         this.webClient = webClient;
-        this.accessTokenGenerator = accessTokenGenerator;
-        this.objectMapper = new ObjectMapper();
     }
 
-    public GoogleCalendarEventResponse searchEvents(String calendarId, LocalDateTime start, LocalDateTime end) {
+    public GoogleCalendarEventResponse searchEvents(String calendarId, String accessToken, LocalDateTime start, LocalDateTime end) {
         log.info("[Test] Search Google Calendar Events, calendarId = {}, startTime = {}, endTime = {}", calendarId, start, end);
 
         String url = generateSearchCalendarEventsUrl(calendarId);
@@ -43,7 +37,7 @@ public class GoogleApiConnectService {
                                 .queryParam("timeMax", end.format(formatter))
                                 .build()
                 )
-                .header(HttpHeaders.AUTHORIZATION, accessTokenGenerator.getAccessToken())
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {

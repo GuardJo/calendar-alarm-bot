@@ -2,6 +2,7 @@ package com.guardjo.calendar.alarm.manager.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor(staticName = "of")
+@ToString
 public class GoogleCalendarEventResponse {
     private String kind;
     private String etag;

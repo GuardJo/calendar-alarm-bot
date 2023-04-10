@@ -25,10 +25,15 @@ public class SecurityConfig {
                                 .permitAll()
                                 .mvcMatchers(HttpMethod.POST, "/web-hook/receive")
                                 .permitAll()
+                                .antMatchers(HttpMethod.GET, "/h2-console/**")
+                                .permitAll()
                                 .anyRequest().authenticated()
+                                .and()
                 ).formLogin(withDefaults())
                 .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"))
                 .oauth2Login()
+                .and()
+                .headers().frameOptions().sameOrigin()
                 .and()
                 .csrf().disable();
 
