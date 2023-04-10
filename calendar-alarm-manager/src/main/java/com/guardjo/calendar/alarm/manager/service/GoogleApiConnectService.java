@@ -20,10 +20,8 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class GoogleApiConnectService {
     private final WebClient webClient;
-    private final AccessTokenGenerator accessTokenGenerator;
-    public GoogleApiConnectService(@Autowired WebClient webClient, @Autowired AccessTokenGenerator accessTokenGenerator) {
+    public GoogleApiConnectService(@Autowired WebClient webClient) {
         this.webClient = webClient;
-        this.accessTokenGenerator = accessTokenGenerator;
     }
 
     public GoogleCalendarEventResponse searchEvents(String calendarId, String accessToken, LocalDateTime start, LocalDateTime end) {
