@@ -60,10 +60,6 @@ public class CalendarEventTransfer {
         return googleCalendarEventResponses;
     }
 
-    private Set<String> findAlarmSettingCalendarIdList() {
-        return alarmSettingService.findAllSettingCalendarIds();
-    }
-
     private GoogleCalendarEventResponse readGoogleCalendarEvents(String calendarId, String accessToken, LocalDateTime startTime, LocalDateTime endTime) {
         try {
             return googleApiConnectService.searchEvents(calendarId, accessToken, startTime, endTime);
