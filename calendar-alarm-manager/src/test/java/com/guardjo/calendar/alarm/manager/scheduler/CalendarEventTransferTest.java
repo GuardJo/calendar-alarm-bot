@@ -1,5 +1,7 @@
 package com.guardjo.calendar.alarm.manager.scheduler;
 
+import com.guardjo.calendar.alarm.manager.domain.AlarmSetting;
+import com.guardjo.calendar.alarm.manager.domain.AlarmSettingDto;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.service.AlarmSettingService;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
@@ -33,16 +35,20 @@ class CalendarEventTransferTest {
     @DisplayName("금일의 구글 캘린더 이벤트 목록 반환 테스트")
     @Test
     void testReadGoogleCalendarEvents() {
+        String calendarId = "testId";
+        String accessToken = "testToken";
         GoogleCalendarEventResponse expectedResponse = TestDataGenerator.generateGoogleCalendarEventResponse();
+        List<AlarmSetting> alarmSettings = List.of(AlarmSetting.of(0L, calendarId, accessToken));
 
-        given(alarmSettingService.findAllSettingCalendarIds()).willReturn(Set.of("testId"));
-        given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
+        given(alarmSettingService.findAll()).willReturn(alarmSettings);
+        given(googleApiConnectService.searchEvents(anyString(), anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(expectedResponse);
 
         List<GoogleCalendarEventResponse> actualResponse = calendarEventTransfer.readAllGoogleCalendarEvents();
 
         assertThat(actualResponse).isEqualTo(List.of(expectedResponse));
 
-        then(googleApiConnectService).should().searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
+        then(alarmSettingService).should().findAll();
+        then(googleApiConnectService).should().searchEvents(anyString(), anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
     }
 }

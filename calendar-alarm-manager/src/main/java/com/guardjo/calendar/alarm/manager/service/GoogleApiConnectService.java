@@ -26,7 +26,7 @@ public class GoogleApiConnectService {
         this.accessTokenGenerator = accessTokenGenerator;
     }
 
-    public GoogleCalendarEventResponse searchEvents(String calendarId, LocalDateTime start, LocalDateTime end) {
+    public GoogleCalendarEventResponse searchEvents(String calendarId, String accessToken, LocalDateTime start, LocalDateTime end) {
         log.info("[Test] Search Google Calendar Events, calendarId = {}, startTime = {}, endTime = {}", calendarId, start, end);
 
         String url = generateSearchCalendarEventsUrl(calendarId);
@@ -39,7 +39,7 @@ public class GoogleApiConnectService {
                                 .queryParam("timeMax", end.format(formatter))
                                 .build()
                 )
-                .header(HttpHeaders.AUTHORIZATION, accessTokenGenerator.getAccessToken())
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {

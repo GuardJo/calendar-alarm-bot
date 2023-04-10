@@ -40,6 +40,7 @@ class GoogleApiConnectServiceTest {
     @Test
     void testSearchEvents() {
         String calendarId = "testId";
+        String accessToken = "testToken";
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusDays(1L);
 
@@ -48,8 +49,6 @@ class GoogleApiConnectServiceTest {
         WebClient.RequestHeadersUriSpec requestHeadersUriSpec = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
         WebClient.ResponseSpec responseSpec = Mockito.mock(WebClient.ResponseSpec.class);
 
-        given(accessTokenGenerator.getAccessToken()).willReturn("testToken");
-
         given(webClient.get()).willReturn(requestHeadersUriSpec);
         given(requestHeadersUriSpec.uri(any(Function.class))).willReturn(requestHeadersUriSpec);
         given(requestHeadersUriSpec.header(eq(HttpHeaders.AUTHORIZATION), anyString())).willReturn(requestHeadersUriSpec);
@@ -57,7 +56,7 @@ class GoogleApiConnectServiceTest {
         given(responseSpec.onStatus(any(Predicate.class), any(Function.class))).willReturn(responseSpec);
         given(responseSpec.bodyToMono(GoogleCalendarEventResponse.class)).willReturn(Mono.just(expectedResponse));
 
-        GoogleCalendarEventResponse actualResponse = googleApiConnectService.searchEvents(calendarId, start, end);
+        GoogleCalendarEventResponse actualResponse = googleApiConnectService.searchEvents(calendarId, accessToken, start, end);
 
         assertThat(actualResponse).isEqualTo(expectedResponse);
     }

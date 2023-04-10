@@ -1,5 +1,6 @@
 package com.guardjo.calendar.alarm.manager.scheduler;
 
+import com.guardjo.calendar.alarm.manager.domain.AlarmSettingDto;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.service.AlarmSettingService;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -30,21 +32,31 @@ public class CalendarEventTransfer {
         log.info("[Test] Scheduling Start, FindAll GoogleCalendarEvents");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.now().plusDays(1L);
-        Set<String> calendarIds = findAlarmSettingCalendarIdList();
+        List<AlarmSettingDto> alarmSettingDtos = alarmSettingService.findAll().stream()
+                .map(AlarmSettingDto::from)
+                .collect(Collectors.toList());
         List<GoogleCalendarEventResponse> googleCalendarEventResponses = new ArrayList<>();
 
-        if (calendarIds.isEmpty()) {
+        if (alarmSettingDtos.isEmpty()) {
             log.warn("[Test] Empty AlarmSettings");
             return null;
         }
 
-        calendarIds.forEach((calendarId) -> {
-            GoogleCalendarEventResponse response = readGoogleCalendarEvents(calendarId, startTime, endTime);
+        alarmSettingDtos.forEach((alarmSettingDto -> {
+            GoogleCalendarEventResponse response = readGoogleCalendarEvents(
+                    alarmSettingDto.calendarId(),
+                    alarmSettingDto.accessToken(),
+                    startTime,
+                    endTime
+            );
+
             if (response != null) {
                 googleCalendarEventResponses.add(response);
             }
-        });
+        }));
 
+        log.info("[Test] response = {}", googleCalendarEventResponses.get(0).toString());
+        // TODO 추후 슬랙 메시지로 전달
         return googleCalendarEventResponses;
     }
 
@@ -52,9 +64,9 @@ public class CalendarEventTransfer {
         return alarmSettingService.findAllSettingCalendarIds();
     }
 
-    private GoogleCalendarEventResponse readGoogleCalendarEvents(String calendarId, LocalDateTime startTime, LocalDateTime endTime) {
+    private GoogleCalendarEventResponse readGoogleCalendarEvents(String calendarId, String accessToken, LocalDateTime startTime, LocalDateTime endTime) {
         try {
-            return googleApiConnectService.searchEvents(calendarId, startTime, endTime);
+            return googleApiConnectService.searchEvents(calendarId, accessToken, startTime, endTime);
         } catch (Exception e) {
             log.warn("[Test] {}", e.getMessage());
             return null;

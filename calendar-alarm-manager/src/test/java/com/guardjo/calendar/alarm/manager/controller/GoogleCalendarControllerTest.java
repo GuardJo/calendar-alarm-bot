@@ -69,8 +69,10 @@ class GoogleCalendarControllerTest {
     void testGetCalendarEvents() throws Exception {
         GoogleCalendarEventResponse googleCalendarEventResponse = TestDataGenerator.generateGoogleCalendarEventResponse();
         String expectedResponse = objectMapper.writeValueAsString(googleCalendarEventResponse);
+        String accessToken = "testToken";
 
-        given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
+        given(accessTokenGenerator.getAccessToken()).willReturn(accessToken);
+        given(googleApiConnectService.searchEvents(anyString(), eq(accessToken), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(googleCalendarEventResponse);
 
         String actualResponse = mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
@@ -79,6 +81,7 @@ class GoogleCalendarControllerTest {
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponse).isEqualTo(expectedResponse);
+        then(googleApiConnectService).should().searchEvents(anyString(), eq(accessToken), any(LocalDateTime.class), any(LocalDateTime.class));
     }
 
     @DisplayName("구글 로그인 정보 없이 특정 캘린더 이벤트 목록 요청 테스트")
@@ -86,7 +89,7 @@ class GoogleCalendarControllerTest {
     void testGetCalendarWithoutAuthentication() throws Exception {
         GoogleCalendarEventResponse googleCalendarEventResponse = TestDataGenerator.generateGoogleCalendarEventResponse();
 
-        given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
+        given(googleApiConnectService.searchEvents(anyString(), anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willReturn(googleCalendarEventResponse);
 
         mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
@@ -101,7 +104,9 @@ class GoogleCalendarControllerTest {
     @WithMockUser
     @Test
     void testGetCalendarEventListWithWrongCalendarId() throws Exception {
-        given(googleApiConnectService.searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
+        String accessToken = "testToken";
+        given(accessTokenGenerator.getAccessToken()).willReturn(accessToken);
+        given(googleApiConnectService.searchEvents(anyString(), eq(accessToken), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .willThrow(new EventNotFoundException("wrongId"));
 
         mockMvc.perform(get(TEST_GET_CALENDAR_EVENT_LIST)
@@ -109,7 +114,7 @@ class GoogleCalendarControllerTest {
                 )
                 .andExpect(status().isNotFound());
 
-        then(googleApiConnectService).should().searchEvents(anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
+        then(googleApiConnectService).should().searchEvents(anyString(), eq(accessToken), any(LocalDateTime.class), any(LocalDateTime.class));
     }
 
     @DisplayName("구글 캘린더 알림 설정 저장 테스트")

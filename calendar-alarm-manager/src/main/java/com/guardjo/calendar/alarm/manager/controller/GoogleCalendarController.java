@@ -33,7 +33,7 @@ public class GoogleCalendarController {
         LocalDateTime endTime = LocalDateTime.now().plusDays(1L);
         log.info("[Test] Request Find GoogleCalendarEvents, calendarId = {}, start = {}, end = {}", calendarId, startTime, endTime);
 
-        return googleApiConnectService.searchEvents(calendarId, startTime, endTime);
+        return googleApiConnectService.searchEvents(calendarId, accessTokenGenerator.getAccessToken(), startTime, endTime);
     }
 
     @PostMapping(UrlConstant.SAVE_ALARM_SETTING_URL)
