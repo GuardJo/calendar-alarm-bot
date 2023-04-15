@@ -1,7 +1,7 @@
 package com.guardjo.calendar.alarm.manager.service;
 
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
-import com.guardjo.calendar.alarm.manager.domain.slack.SlackWebHookBody;
+import com.guardjo.calendar.alarm.manager.domain.slack.WebHookBody;
 import com.guardjo.calendar.alarm.manager.util.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class WebhookConnectServiceTest {
     @Test
     void testSendData() {
         GoogleCalendarEventResponse testResponse = TestDataGenerator.generateGoogleCalendarEventResponse();
-        SlackWebHookBody testBody = SlackWebHookBody.of(testResponse.getSummary());
+        WebHookBody testBody = WebHookBody.of(null);
 
         WebClient.RequestBodyUriSpec requestBodyUriSpec = Mockito.mock(WebClient.RequestBodyUriSpec.class);
         WebClient.RequestBodySpec requestBodySpec = Mockito.mock(WebClient.RequestBodySpec.class);
