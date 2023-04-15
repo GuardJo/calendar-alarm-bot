@@ -4,6 +4,7 @@ import com.guardjo.calendar.alarm.manager.domain.AlarmSettingDto;
 import com.guardjo.calendar.alarm.manager.domain.GoogleCalendarEventResponse;
 import com.guardjo.calendar.alarm.manager.service.AlarmSettingService;
 import com.guardjo.calendar.alarm.manager.service.GoogleApiConnectService;
+import com.guardjo.calendar.alarm.manager.service.WebhookConnectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,11 +19,14 @@ import java.util.stream.Collectors;
 public class CalendarEventTransfer {
     private final GoogleApiConnectService googleApiConnectService;
     private final AlarmSettingService alarmSettingService;
+    private final WebhookConnectService webhookConnectService;
 
     public CalendarEventTransfer(GoogleApiConnectService googleApiConnectService,
-                                 AlarmSettingService alarmSettingService) {
+                                 AlarmSettingService alarmSettingService,
+                                 WebhookConnectService webhookConnectService) {
         this.googleApiConnectService = googleApiConnectService;
         this.alarmSettingService = alarmSettingService;
+        this.webhookConnectService = webhookConnectService;
     }
 
     // TODO 테스트 용도로 10초 마다 구동되게끔 설정 (향후 변경 예정)
@@ -57,6 +60,9 @@ public class CalendarEventTransfer {
 
         log.info("[Test] response = {}", googleCalendarEventResponses.get(0).toString());
         // TODO 추후 슬랙 메시지로 전달
+        googleCalendarEventResponses.stream()
+                .forEach(response -> webhookConnectService.sendEvents(response));
+
         return googleCalendarEventResponses;
     }
 
