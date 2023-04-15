@@ -1,5 +1,6 @@
 package com.guardjo.calendar.alarm.manager.config;
 
+import com.guardjo.calendar.alarm.manager.service.SlackWebhookUrl;
 import com.guardjo.calendar.alarm.manager.util.GoogleCalendarAPI;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +45,15 @@ public class SecurityConfig {
     public WebClient webClient() {
         WebClient webClient = WebClient.builder()
                 .baseUrl(GoogleCalendarAPI.GOOGLE_CALENDER_REQUEST_PREFIX_URL)
+                .build();
+
+        return webClient;
+    }
+
+    @Bean
+    public WebClient slackClient() {
+        WebClient webClient = WebClient.builder()
+                .baseUrl(SlackWebhookUrl.SLACK_WEBHOOK_URL)
                 .build();
 
         return webClient;
