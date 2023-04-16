@@ -10,9 +10,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.reactive.function.BodyExtractor;
+import org.springframework.web.reactive.function.BodyExtractors;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunctions;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -64,8 +69,8 @@ public class SecurityConfig {
         WebClient webClient = WebClient.builder()
                 .baseUrl(SlackWebhookUrl.SLACK_WEBHOOK_URL)
                 .filter(((request, next) -> {
-                    log.info("[Test] Request Body = {}", request.body());
-
+                    log.info("[Test] RequestUrl = {}", request.url());
+                    log.info("[Test] RequestHeaders = {}", request.headers());
                     return next.exchange(request);
                 }))
                 .build();
