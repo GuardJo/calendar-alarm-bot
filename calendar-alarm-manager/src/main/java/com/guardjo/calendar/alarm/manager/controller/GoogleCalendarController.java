@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @RestController
 @RequestMapping(UrlConstant.GOOGLE_CALENDAR_PREFIX)
@@ -29,8 +30,8 @@ public class GoogleCalendarController {
 
     @GetMapping(UrlConstant.GET_CALENDAR_EVENT_LIST_URL)
     public GoogleCalendarEventResponse findGoogleCalendarEvents(@RequestParam String calendarId) {
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = LocalDateTime.now().plusDays(1L);
+        ZonedDateTime startTime = ZonedDateTime.now();
+        ZonedDateTime endTime = ZonedDateTime.now().plusDays(1L);
         log.info("[Test] Request Find GoogleCalendarEvents, calendarId = {}, start = {}, end = {}", calendarId, startTime, endTime);
 
         return googleApiConnectService.searchEvents(calendarId, accessTokenGenerator.getAccessToken(), startTime, endTime);

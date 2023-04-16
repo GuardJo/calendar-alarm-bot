@@ -26,3 +26,75 @@ calendar-alarm-bot 설계 구조
 3. 실행 시점에 구글 캘린더 api를 통해 당일 시작되는 이벤트 목록 반환
 4. 반환받은 이벤트 항목을 slack에 알맞게 가공하여 slack webhook으로 전달
 5. webhook을 통해 넘어온 메시지 출력
+
+# 알람 설정 정보
+
+```json
+{ 
+	"calendarId" : "알림 지정할 캘린더 id",
+	"accessToken" : "로그인 된 사용자의 token"
+}
+```
+
+1. 사용자가 web화면에서 알림을 수신할 id 지정
+
+# 슬랙 메시지 포멧
+
+## preview
+
+![slack_format](documents/alarm_bot_slack_format.png)
+
+## format
+
+```json
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Today's CLOUD실 일정"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*<https://google.com|이벤트명>*\n시간"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*<https://google.com|이벤트명>*\n시간"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*<https://google.com|이벤트명>*\n시간"
+			}
+		},
+		{
+			"type": "divider"
+		}
+	]
+}
+```

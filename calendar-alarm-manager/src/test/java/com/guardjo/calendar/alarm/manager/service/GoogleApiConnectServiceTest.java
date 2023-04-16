@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -41,8 +42,8 @@ class GoogleApiConnectServiceTest {
     void testSearchEvents() {
         String calendarId = "testId";
         String accessToken = "testToken";
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = start.plusDays(1L);
+        ZonedDateTime start = ZonedDateTime.now();
+        ZonedDateTime end = start.plusDays(1L);
 
         GoogleCalendarEventResponse expectedResponse = TestDataGenerator.generateGoogleCalendarEventResponse();
 
