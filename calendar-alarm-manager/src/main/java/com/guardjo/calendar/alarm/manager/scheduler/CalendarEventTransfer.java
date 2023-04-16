@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,8 +34,8 @@ public class CalendarEventTransfer {
     @Scheduled(cron = "*/10 * * * * *")
     public List<GoogleCalendarEventResponse> readAllGoogleCalendarEvents() {
         log.info("[Test] Scheduling Start, FindAll GoogleCalendarEvents");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = LocalDateTime.now().plusDays(1L);
+        ZonedDateTime startTime = ZonedDateTime.now();
+        ZonedDateTime endTime = ZonedDateTime.now().plusDays(1L);
         List<AlarmSettingDto> alarmSettingDtos = alarmSettingService.findAll().stream()
                 .map(AlarmSettingDto::from)
                 .collect(Collectors.toList());
@@ -66,7 +67,7 @@ public class CalendarEventTransfer {
         return googleCalendarEventResponses;
     }
 
-    private GoogleCalendarEventResponse readGoogleCalendarEvents(String calendarId, String accessToken, LocalDateTime startTime, LocalDateTime endTime) {
+    private GoogleCalendarEventResponse readGoogleCalendarEvents(String calendarId, String accessToken, ZonedDateTime startTime, ZonedDateTime endTime) {
         try {
             return googleApiConnectService.searchEvents(calendarId, accessToken, startTime, endTime);
         } catch (Exception e) {

@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 public class JacksonConfig {
     public final static String DATE_FORMAT = "yyyy-MM-dd";
     public final static String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return jacksonObjectMapperBuilder -> {

@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -43,7 +44,7 @@ class CalendarEventTransferTest {
         List<AlarmSetting> alarmSettings = List.of(AlarmSetting.of(0L, calendarId, accessToken));
 
         given(alarmSettingService.findAll()).willReturn(alarmSettings);
-        given(googleApiConnectService.searchEvents(anyString(), anyString(), any(LocalDateTime.class), any(LocalDateTime.class)))
+        given(googleApiConnectService.searchEvents(anyString(), anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class)))
                 .willReturn(expectedResponse);
         willDoNothing().given(webhookConnectService).sendEvents(expectedResponse);
 
@@ -52,7 +53,7 @@ class CalendarEventTransferTest {
         assertThat(actualResponse).isEqualTo(List.of(expectedResponse));
 
         then(alarmSettingService).should().findAll();
-        then(googleApiConnectService).should().searchEvents(anyString(), anyString(), any(LocalDateTime.class), any(LocalDateTime.class));
+        then(googleApiConnectService).should().searchEvents(anyString(), anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class));
         then(webhookConnectService).should().sendEvents(expectedResponse);
     }
 }

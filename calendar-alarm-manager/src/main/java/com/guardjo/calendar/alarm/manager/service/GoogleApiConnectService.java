@@ -13,7 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -24,17 +28,21 @@ public class GoogleApiConnectService {
         this.webClient = webClient;
     }
 
-    public GoogleCalendarEventResponse searchEvents(String calendarId, String accessToken, LocalDateTime start, LocalDateTime end) {
-        log.info("[Test] Search Google Calendar Events, calendarId = {}, startTime = {}, endTime = {}", calendarId, start, end);
-
+    public GoogleCalendarEventResponse searchEvents(String calendarId, String accessToken, ZonedDateTime start, ZonedDateTime end) {
         String url = generateSearchCalendarEventsUrl(calendarId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(JacksonConfig.DATE_TIME_FORMAT);
+        
+        // Google Calendar API에서 시간값으로 탐색 시 UTC 기반으로 탐색하기 떄문에 UTC로 변환
+        String timeMin = start.format(formatter.withZone(ZoneId.of("UTC")));
+        String timeMax = end.format(formatter.withZone(ZoneId.of("UTC")));
+
+        log.info("[Test] Search Google Calendar Events, calendarId = {}, startTime = {}, endTime = {}", calendarId, timeMin, timeMax);
 
         return webClient.get()
                 .uri(uriBuilder ->
                         uriBuilder.path(url)
-                                .queryParam("timeMin", start.format(formatter))
-                                .queryParam("timeMax", end.format(formatter))
+                                .queryParam("timeMin", timeMin)
+                                .queryParam("timeMax", timeMax)
                                 .build()
                 )
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
