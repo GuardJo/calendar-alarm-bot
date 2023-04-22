@@ -27,6 +27,12 @@ calendar-alarm-bot 설계 구조
 4. 반환받은 이벤트 항목을 slack에 알맞게 가공하여 slack webhook으로 전달
 5. webhook을 통해 넘어온 메시지 출력
 
+# 실행 환경 변수
+
+- `GOOGLE_OAUTH2_KEY` : 구글 로그인 관련 key
+- `GOOGLE_OAUTH2_SECRET` : 구글 로그인 관련 secret
+- `SLACK_WEBHOOK_URL` : 알림 수신용 Slack webhooh url
+
 # 알람 설정 정보
 
 ```json
